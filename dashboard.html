@@ -6,45 +6,35 @@
 <title>灰色关联分析 — 公司综合评价结果</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Manrope:wght@200;300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   /* ========== TOKEN SYSTEM ========== */
   :root {
-    /* Depth */
-    --bg-deep:    #070b10;
-    --bg-surface: #0f1722;
-    --bg-card:    #151e2b;
-    --bg-elevated:#1b2738;
-    --border-subtle: rgba(255,255,255,0.06);
+    --bg-deep:    #06090d;
+    --bg-surface: #0d131c;
+    --bg-card:    rgba(18, 25, 38, 0.65);
+    --bg-elevated:rgba(24, 34, 50, 0.8);
+    --border-subtle: rgba(255,255,255,0.05);
     --border-visible: rgba(255,255,255,0.10);
 
-    /* Signal */
     --teal:       #3dd9a5;
-    --teal-dim:   #2a9e78;
-    --teal-glow:  rgba(61,217,165,0.18);
+    --teal-glow:  rgba(61,217,165,0.20);
     --coral:      #ff6b6b;
-    --coral-dim:  #c94a4a;
     --blue:       #5b8def;
-    --blue-dim:   #4268b8;
-    --amber:      #f0c040;
+    --amber:      #f0bc4a;
 
-    /* Text */
-    --text-primary:   #e6edf3;
-    --text-secondary: #8b9bb5;
-    --text-muted:     #556278;
-    --text-inverse:   #070b10;
+    --text-primary:   #e8edf4;
+    --text-secondary: #8897ab;
+    --text-muted:     #4a5668;
 
-    /* Typography scale */
-    --font-mono:  'DM Mono', 'Noto Sans SC', monospace;
-    --font-sans:  'DM Sans', 'Noto Sans SC', sans-serif;
+    --font-display: 'Syne', 'Noto Sans SC', sans-serif;
+    --font-body:    'Manrope', 'Noto Sans SC', sans-serif;
+    --font-mono:    'Space Mono', 'Noto Sans SC', monospace;
 
-    /* Spacing */
-    --space-unit: 8px;
-
-    /* Motion */
-    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring:cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth:cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* ========== RESET ========== */
@@ -53,495 +43,473 @@
   body {
     background: var(--bg-deep);
     color: var(--text-primary);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    font-weight: 400;
   }
 
-  /* ========== AMBIENT BACKGROUND ========== */
-  .bg-grid {
+  /* ========== FLUID GLOW BLOBS ========== */
+  .blob-layer {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    background-image:
-      linear-gradient(rgba(61,217,165,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(61,217,165,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 70%);
+    overflow: hidden;
   }
-  .bg-glow {
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.28;
+    will-change: transform;
+  }
+  .blob-1 {
+    width: 620px; height: 620px;
+    background: radial-gradient(circle, rgba(61,217,165,0.55) 0%, transparent 70%);
+    top: -15%; left: 10%;
+    animation: blobFloat1 18s ease-in-out infinite;
+  }
+  .blob-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(91,141,239,0.45) 0%, transparent 70%);
+    top: 40%; right: -8%;
+    animation: blobFloat2 22s ease-in-out infinite;
+  }
+  .blob-3 {
+    width: 450px; height: 450px;
+    background: radial-gradient(circle, rgba(255,107,107,0.35) 0%, transparent 70%);
+    bottom: 10%; left: 25%;
+    animation: blobFloat3 20s ease-in-out infinite;
+  }
+  .blob-4 {
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(240,188,74,0.30) 0%, transparent 70%);
+    top: 55%; left: 50%;
+    animation: blobFloat4 24s ease-in-out infinite;
+  }
+
+  @keyframes blobFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(120px, -60px) scale(1.12); }
+    50% { transform: translate(-40px, 80px) scale(0.92); }
+    75% { transform: translate(-100px, -30px) scale(1.08); }
+  }
+  @keyframes blobFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(-130px, 70px) scale(1.10); }
+    50% { transform: translate(50px, -90px) scale(0.90); }
+    75% { transform: translate(90px, 40px) scale(1.06); }
+  }
+  @keyframes blobFloat3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(100px, -100px) scale(1.15); }
+    66% { transform: translate(-80px, 50px) scale(0.88); }
+  }
+  @keyframes blobFloat4 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-90px, -70px) scale(1.08); }
+    66% { transform: translate(70px, 90px) scale(0.93); }
+  }
+
+  /* Subtle grain overlay */
+  .grain {
     position: fixed;
-    top: -40%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 900px;
-    height: 700px;
-    background: radial-gradient(ellipse, rgba(61,217,165,0.06) 0%, transparent 70%);
+    inset: 0;
     pointer-events: none;
     z-index: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
   }
 
   /* ========== LAYOUT ========== */
-  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
 
   /* ========== HERO ========== */
   .hero {
-    padding: 80px 0 60px;
+    padding: 100px 0 70px;
     text-align: center;
     position: relative;
   }
   .hero-eyebrow {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 400;
-    letter-spacing: 0.25em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--teal);
-    margin-bottom: 16px;
+    margin-bottom: 20px;
+    opacity: 0.85;
   }
   .hero-title {
-    font-family: var(--font-sans);
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
     color: var(--text-primary);
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    line-height: 1.15;
   }
   .hero-subtitle {
+    font-family: var(--font-body);
     font-size: 1rem;
     color: var(--text-secondary);
-    max-width: 560px;
-    margin: 0 auto 48px;
+    max-width: 540px;
+    margin: 0 auto 56px;
     font-weight: 400;
+    letter-spacing: -0.005em;
   }
 
-  /* ========== INSTRUMENT READOUT (Signature) ========== */
+  /* ========== INSTRUMENT (Signature) ========== */
+  .instrument-wrap { position: relative; margin: 0 auto 40px; width: 340px; height: 340px; }
   .instrument {
     position: relative;
-    width: 320px;
-    height: 320px;
-    margin: 0 auto 32px;
+    width: 100%; height: 100%;
   }
-  .instrument-ring {
+  .inst-glow {
     position: absolute;
-    inset: 0;
+    inset: -40px;
     border-radius: 50%;
-    border: 1.5px solid rgba(255,255,255,0.08);
+    background: radial-gradient(circle, rgba(61,217,165,0.09) 30%, transparent 70%);
+    animation: instPulse 4s ease-in-out infinite;
   }
-  .instrument-ring-outer { inset: -12px; border-color: rgba(61,217,165,0.12); }
-  .instrument-ring-inner { inset: 24px; border-color: rgba(61,217,165,0.06); border-style: dashed; }
-  .instrument-arc {
-    position: absolute;
-    inset: -18px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    border-top-color: var(--teal);
-    border-right-color: var(--teal);
-    transform: rotate(-45deg);
-    mask-image: conic-gradient(black 0deg, black 280deg, transparent 280deg);
-    -webkit-mask-image: conic-gradient(black 0deg, black 280deg, transparent 280deg);
-    opacity: 0.7;
+  @keyframes instPulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.08); opacity: 1; }
   }
-  .instrument-value {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  .inst-ring { position: absolute; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.06); }
+  .inst-ring-1 { inset: 0; }
+  .inst-ring-2 { inset: 16px; border-color: rgba(255,255,255,0.04); }
+  .inst-ring-3 { inset: 32px; border-color: rgba(61,217,165,0.06); border-style: dashed; animation: ringRotate 40s linear infinite; }
+  @keyframes ringRotate { to { transform: rotate(360deg); } }
+  .inst-value {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
-  .instrument-grade {
+  .inst-grade {
     font-family: var(--font-mono);
-    font-size: 4rem;
-    font-weight: 300;
+    font-size: 4.4rem;
+    font-weight: 400;
     color: var(--teal);
     line-height: 1;
-    letter-spacing: -0.03em;
-    text-shadow: 0 0 60px var(--teal-glow);
-    transition: all 0.6s var(--ease-out);
+    letter-spacing: -0.04em;
+    text-shadow: 0 0 80px var(--teal-glow), 0 0 30px rgba(61,217,165,0.15);
+    background: linear-gradient(180deg, #5ff5c8 0%, #3dd9a5 40%, #2a9e78 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradeShimmer 5s ease-in-out infinite;
+    background-size: 100% 200%;
   }
-  .instrument-label {
+  @keyframes gradeShimmer {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 0% 100%; }
+  }
+  .inst-label {
     font-family: var(--font-mono);
     font-size: 0.7rem;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.22em;
     color: var(--text-muted);
-    margin-top: 8px;
+    margin-top: 10px;
     text-transform: uppercase;
+    font-weight: 400;
   }
-  .instrument-winner {
-    font-family: var(--font-sans);
-    font-size: 1.1rem;
+  .inst-winner {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-top: 4px;
-    letter-spacing: 0.05em;
-  }
-  .instrument-scanline {
-    position: absolute;
-    left: 10%;
-    right: 10%;
-    top: 50%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(61,217,165,0.4), transparent);
-    animation: scanline 3s ease-in-out infinite;
-    pointer-events: none;
-  }
-  @keyframes scanline {
-    0%, 100% { top: 30%; opacity: 0; }
-    50% { top: 52%; opacity: 1; }
+    margin-top: 6px;
+    letter-spacing: 0.06em;
   }
 
-  /* ========== STATS ROW ========== */
+  /* ========== STATS ========== */
   .stats-row {
-    display: flex;
-    justify-content: center;
-    gap: 48px;
-    flex-wrap: wrap;
-    margin-bottom: 80px;
+    display: flex; justify-content: center; gap: 56px; flex-wrap: wrap; margin-bottom: 90px;
   }
   .stat-item { text-align: center; }
   .stat-value {
     font-family: var(--font-mono);
-    font-size: 1.75rem;
-    font-weight: 400;
-    color: var(--text-primary);
+    font-size: 1.8rem; font-weight: 400; color: var(--text-primary); letter-spacing: -0.02em;
   }
   .stat-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 4px;
+    font-family: var(--font-body);
+    font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px; font-weight: 500;
   }
 
-  /* ========== SECTION HEADERS ========== */
-  .section { padding: 48px 0; }
+  /* ========== SECTIONS ========== */
+  .section { padding: 56px 0; }
   .section-header {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 32px;
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 16px;
+    display: flex; align-items: baseline; gap: 18px; margin-bottom: 36px;
+    border-bottom: 1px solid var(--border-subtle); padding-bottom: 18px;
   }
-  .section-number {
+  .section-index {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--teal);
-    letter-spacing: 0.15em;
+    font-size: 0.7rem; color: var(--teal); letter-spacing: 0.18em; opacity: 0.8;
   }
   .section-title {
-    font-family: var(--font-sans);
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
+    font-family: var(--font-display);
+    font-size: 1.35rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.015em;
   }
   .section-desc {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-left: auto;
-    max-width: 340px;
-    text-align: right;
-    line-height: 1.5;
+    font-family: var(--font-body);
+    font-size: 0.82rem; color: var(--text-secondary); margin-left: auto; max-width: 320px; text-align: right; line-height: 1.5;
   }
 
   /* ========== RANKING CARDS ========== */
   .ranking-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 12px;
-    margin-bottom: 8px;
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px;
   }
   .rank-card {
     background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border-subtle);
-    border-radius: 12px;
-    padding: 20px 16px;
+    border-radius: 16px;
+    padding: 24px 16px;
     text-align: center;
     position: relative;
-    transition: all 0.35s var(--ease-out);
+    transition: all 0.4s var(--ease-smooth);
     cursor: default;
+    overflow: hidden;
   }
+  .rank-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(61,217,165,0.06) 0%, transparent 70%);
+    opacity: 0; transition: opacity 0.5s;
+  }
+  .rank-card:hover::before { opacity: 1; }
   .rank-card:hover {
     border-color: var(--border-visible);
     background: var(--bg-elevated);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    backdrop-filter: blur(24px);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(61,217,165,0.08);
   }
   .rank-card.winner {
-    border-color: var(--teal-dim);
-    background: linear-gradient(180deg, rgba(61,217,165,0.08) 0%, var(--bg-card) 60%);
+    border-color: rgba(61,217,165,0.2);
+    background: linear-gradient(180deg, rgba(61,217,165,0.08) 0%, var(--bg-card) 55%);
   }
-  .rank-card.winner:hover { border-color: var(--teal); box-shadow: 0 12px 40px var(--teal-glow); }
+  .rank-card.winner::after {
+    content: '';
+    position: absolute; top: 0; left: 20%; right: 20%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(61,217,165,0.4), transparent);
+  }
   .rank-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-bottom: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 50%;
+    font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700;
+    margin-bottom: 14px;
   }
-  .rank-badge.gold   { background: rgba(240,192,64,0.2); color: var(--amber); }
-  .rank-badge.silver { background: rgba(148,163,184,0.15); color: #a0aec0; }
+  .rank-badge.gold   { background: rgba(240,188,74,0.18); color: #f0c040; }
+  .rank-badge.silver { background: rgba(160,172,190,0.12); color: #a0acbe; }
   .rank-badge.bronze { background: rgba(205,127,50,0.15); color: #cd7f32; }
-  .rank-badge.normal { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+  .rank-badge.normal { background: rgba(255,255,255,0.05); color: var(--text-muted); }
   .rank-company {
-    font-family: var(--font-sans);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-family: var(--font-display);
+    font-size: 1.6rem; font-weight: 700; color: var(--text-primary);
+    text-transform: uppercase; letter-spacing: 0.04em;
   }
   .rank-grade {
     font-family: var(--font-mono);
-    font-size: 0.95rem;
-    color: var(--teal);
-    margin-top: 4px;
-    font-weight: 400;
+    font-size: 0.92rem; color: var(--teal); margin-top: 6px; font-weight: 400;
   }
   .rank-bar-bg {
-    margin-top: 12px;
-    height: 4px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 2px;
-    overflow: hidden;
+    margin-top: 14px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden;
   }
   .rank-bar-fill {
-    height: 100%;
-    border-radius: 2px;
-    background: var(--teal);
-    transition: width 1s var(--ease-spring);
+    height: 100%; border-radius: 2px; background: var(--teal);
+    transition: width 1.2s var(--ease-spring);
   }
-  .rank-bar-fill.top { background: var(--teal); }
   .rank-level {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    margin-top: 8px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: 0.68rem; color: var(--text-muted); margin-top: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500;
   }
 
-  /* ========== TWO-COLUMN LAYOUT ========== */
+  /* ========== TWO-COL ========== */
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
 
-  /* ========== RADAR CHART PANEL ========== */
+  /* ========== PANELS ========== */
   .panel {
     background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border-subtle);
-    border-radius: 16px;
-    padding: 24px;
+    border-radius: 18px; padding: 28px;
   }
-  .panel-header { margin-bottom: 16px; }
-  .panel-title { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); }
+  .panel-header { margin-bottom: 20px; }
+  .panel-title { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
   .radar-container { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
-  .company-toggles { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+  .company-toggles { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
   .toggle-btn {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    padding: 6px 14px;
-    border: 1px solid var(--border-subtle);
-    background: transparent;
-    color: var(--text-secondary);
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s var(--ease-out);
-    letter-spacing: 0.05em;
+    font-family: var(--font-mono); font-size: 0.72rem; padding: 7px 16px;
+    border: 1px solid var(--border-subtle); background: transparent; color: var(--text-secondary);
+    border-radius: 24px; cursor: pointer; transition: all 0.25s var(--ease-smooth);
+    letter-spacing: 0.04em; font-weight: 400;
   }
   .toggle-btn:hover { border-color: var(--border-visible); color: var(--text-primary); }
-  .toggle-btn.active { background: rgba(61,217,165,0.12); border-color: var(--teal-dim); color: var(--teal); }
+  .toggle-btn.active {
+    background: rgba(61,217,165,0.1); border-color: rgba(61,217,165,0.3); color: var(--teal);
+    box-shadow: 0 0 20px rgba(61,217,165,0.08);
+  }
 
-  /* ========== WEIGHTS BAR CHART ========== */
-  .weight-list { display: flex; flex-direction: column; gap: 6px; }
+  /* ========== WEIGHTS ========== */
+  .weight-list { display: flex; flex-direction: column; gap: 4px; }
   .weight-item {
-    display: grid;
-    grid-template-columns: 140px 1fr 64px;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border-subtle);
+    display: grid; grid-template-columns: 130px 1fr 60px; align-items: center; gap: 14px;
+    padding: 10px 0; border-bottom: 1px solid var(--border-subtle);
     transition: background 0.2s;
   }
-  .weight-item:hover { background: rgba(255,255,255,0.015); }
+  .weight-item:hover { background: rgba(255,255,255,0.012); }
   .weight-label {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-    text-align: right;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-family: var(--font-body);
+    font-size: 0.78rem; color: var(--text-secondary); text-align: right;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;
   }
   .weight-track {
-    height: 6px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 3px;
-    overflow: hidden;
+    height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden;
   }
-  .weight-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 1s var(--ease-spring);
-  }
+  .weight-fill { height: 100%; border-radius: 3px; transition: width 1.2s var(--ease-spring); }
   .weight-fill.benefit { background: var(--blue); }
   .weight-fill.cost    { background: var(--coral); }
   .weight-fill.medium  { background: var(--amber); }
   .weight-value {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--text-primary);
+    font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-primary); font-weight: 400;
   }
 
-  /* ========== HEATMAP TABLE ========== */
+  /* ========== HEATMAP ========== */
   .heatmap-wrapper { overflow-x: auto; }
   .heatmap-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
   .heatmap-table th {
-    font-family: var(--font-mono);
-    font-weight: 400;
-    color: var(--text-muted);
-    padding: 8px 6px;
-    text-align: center;
-    letter-spacing: 0.04em;
+    font-family: var(--font-mono); font-weight: 400; color: var(--text-muted);
+    padding: 10px 6px; text-align: center; letter-spacing: 0.05em;
   }
-  .heatmap-table th:first-child { text-align: left; padding-left: 12px; }
+  .heatmap-table th:first-child { text-align: left; padding-left: 14px; }
   .heatmap-table td {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    text-align: center;
-    padding: 6px 4px;
-    transition: all 0.2s;
+    font-family: var(--font-mono); font-size: 0.7rem; text-align: center; padding: 8px 5px; transition: all 0.2s;
   }
   .heatmap-table td:first-child {
-    text-align: left;
-    padding-left: 12px;
-    color: var(--text-secondary);
-    font-size: 0.72rem;
-    white-space: nowrap;
+    text-align: left; padding-left: 14px; color: var(--text-secondary);
+    font-family: var(--font-body); font-size: 0.73rem; white-space: nowrap; font-weight: 500;
   }
   .heatmap-table tr { border-bottom: 1px solid var(--border-subtle); }
-  .heatmap-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+  .heatmap-table tbody tr:hover td { background: rgba(255,255,255,0.015); }
 
   /* ========== METHODOLOGY ========== */
   .method-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;
   }
   .method-card {
     background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border-subtle);
-    border-radius: 12px;
-    padding: 24px;
-    transition: border-color 0.3s;
+    border-radius: 16px; padding: 28px;
+    transition: all 0.35s var(--ease-smooth);
+    position: relative; overflow: hidden;
   }
-  .method-card:hover { border-color: var(--border-visible); }
-  .method-icon {
-    font-family: var(--font-mono);
-    font-size: 2rem;
-    margin-bottom: 12px;
-    display: block;
+  .method-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(61,217,165,0.04) 0%, transparent 70%);
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .method-card:hover { border-color: var(--border-visible); transform: translateY(-4px); }
+  .method-card:hover::before { opacity: 1; }
+  .method-step {
+    font-family: var(--font-mono); font-size: 2rem; color: var(--teal); margin-bottom: 14px;
+    display: block; opacity: 0.8; font-weight: 400;
   }
   .method-card h4 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--text-primary);
+    font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 10px;
+    color: var(--text-primary); letter-spacing: -0.01em;
   }
   .method-card p {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
+    font-family: var(--font-body);
+    font-size: 0.81rem; color: var(--text-secondary); line-height: 1.65; font-weight: 400;
   }
 
   /* ========== FOOTER ========== */
   .footer {
-    text-align: center;
-    padding: 48px 0;
-    border-top: 1px solid var(--border-subtle);
-    margin-top: 48px;
+    text-align: center; padding: 52px 0;
+    border-top: 1px solid var(--border-subtle); margin-top: 56px;
   }
-  .footer-text { font-size: 0.75rem; color: var(--text-muted); }
-  .footer-mono { font-family: var(--font-mono); color: var(--teal-dim); }
+  .footer-text { font-family: var(--font-body); font-size: 0.75rem; color: var(--text-muted); }
+  .footer-mono { font-family: var(--font-mono); color: var(--teal); opacity: 0.7; }
+
+  /* ========== REVEAL ANIMATION ========== */
+  .reveal {
+    opacity: 0; transform: translateY(28px); transition: all 0.8s var(--ease-smooth);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
 
   /* ========== RESPONSIVE ========== */
-  @media (max-width: 1024px) {
+  @media (max-width: 1080px) {
     .ranking-grid { grid-template-columns: repeat(4, 1fr); }
     .ranking-grid .rank-card:nth-child(1) { grid-column: 1 / -1; }
     .two-col { grid-template-columns: 1fr; }
     .method-grid { grid-template-columns: 1fr; }
   }
-  @media (max-width: 640px) {
+  @media (max-width: 680px) {
     .ranking-grid { grid-template-columns: repeat(2, 1fr); }
-    .company-toggles { gap: 4px; }
-    .toggle-btn { font-size: 0.65rem; padding: 4px 10px; }
-    .instrument { width: 240px; height: 240px; }
-    .instrument-grade { font-size: 3rem; }
-    .stats-row { gap: 24px; }
+    .company-toggles { gap: 5px; }
+    .toggle-btn { font-size: 0.65rem; padding: 5px 12px; }
+    .instrument-wrap { width: 260px; height: 260px; }
+    .inst-grade { font-size: 3.4rem; }
+    .stats-row { gap: 28px; }
+    .hero { padding: 60px 0 40px; }
   }
-
-  /* ========== ANIMATIONS ========== */
-  .reveal { opacity: 0; transform: translateY(24px); transition: all 0.7s var(--ease-out); }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    .blob { display: none; }
     .reveal { opacity: 1; transform: none; }
   }
-
-  /* Keyboard focus */
   .toggle-btn:focus-visible, a:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 4px; }
 </style>
 </head>
 <body>
 
-<div class="bg-grid"></div>
-<div class="bg-glow"></div>
+<!-- Fluid Glow Blobs -->
+<div class="blob-layer">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+<div class="grain"></div>
 
 <!-- ==================== HERO ==================== -->
 <header class="hero">
   <div class="container">
     <p class="hero-eyebrow">Entropy Weight · Grey Relational Analysis</p>
     <h1 class="hero-title">基于熵权法-灰色关联分析<br>公司综合评价</h1>
-    <p class="hero-subtitle">对 a、b、c、d、e、f、g 七家公司进行多维度客观评价，以灰色关联度衡量综合表现</p>
+    <p class="hero-subtitle">对 a、b、c、d、e、f、g 七家公司进行多维度客观评价<br>以灰色关联度衡量综合表现</p>
 
-    <!-- Instrument Readout -->
-    <div class="instrument" aria-label="最高灰色关联度 0.891155，公司 d">
-      <div class="instrument-ring instrument-ring-outer"></div>
-      <div class="instrument-ring"></div>
-      <div class="instrument-ring instrument-ring-inner"></div>
-      <div class="instrument-arc"></div>
-      <div class="instrument-scanline"></div>
-      <div class="instrument-value">
-        <span class="instrument-grade" id="heroGrade">0.891155</span>
-        <span class="instrument-label">灰色关联度</span>
-        <span class="instrument-winner">🏆 公司 d</span>
+    <!-- Instrument -->
+    <div class="instrument-wrap">
+      <div class="instrument">
+        <div class="inst-glow"></div>
+        <div class="inst-ring inst-ring-1"></div>
+        <div class="inst-ring inst-ring-2"></div>
+        <div class="inst-ring inst-ring-3"></div>
+        <div class="inst-value">
+          <span class="inst-grade">0.891155</span>
+          <span class="inst-label">灰色关联度</span>
+          <span class="inst-winner">公司 D</span>
+        </div>
       </div>
     </div>
 
     <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-item">
-        <div class="stat-value">0.8912</div>
-        <div class="stat-label">最高关联度</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value">0.5044</div>
-        <div class="stat-label">最低关联度</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value">0.3867</div>
-        <div class="stat-label">极差</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value">0.6418</div>
-        <div class="stat-label">平均关联度</div>
-      </div>
+      <div class="stat-item"><div class="stat-value">0.8912</div><div class="stat-label">最高关联度</div></div>
+      <div class="stat-item"><div class="stat-value">0.5044</div><div class="stat-label">最低关联度</div></div>
+      <div class="stat-item"><div class="stat-value">0.3867</div><div class="stat-label">极差</div></div>
+      <div class="stat-item"><div class="stat-value">0.6418</div><div class="stat-label">平均关联度</div></div>
     </div>
   </div>
 </header>
@@ -550,38 +518,27 @@
 <section class="section">
   <div class="container">
     <div class="section-header reveal">
-      <span class="section-number">01</span>
+      <span class="section-index">01</span>
       <h2 class="section-title">综合评价排名</h2>
-      <p class="section-desc">灰色关联度越接近 1，表示与理想公司的相似度越高，综合表现越优</p>
+      <p class="section-desc">灰色关联度越接近 1，与理想公司相似度越高，综合表现越优</p>
     </div>
-    <div class="ranking-grid reveal" id="rankingGrid">
-      <!-- Filled by JS -->
-    </div>
+    <div class="ranking-grid reveal" id="rankingGrid"></div>
   </div>
 </section>
 
-<!-- ==================== CHARTS: Radar + Weights ==================== -->
+<!-- ==================== CHARTS ==================== -->
 <section class="section">
   <div class="container">
     <div class="two-col">
-
-      <!-- Radar Chart -->
       <div class="panel reveal">
         <div class="panel-header"><h3 class="panel-title">加权指标雷达图</h3></div>
         <div class="radar-container"><canvas id="radarChart"></canvas></div>
-        <div class="company-toggles" id="radarToggles">
-          <!-- Filled by JS -->
-        </div>
+        <div class="company-toggles" id="radarToggles"></div>
       </div>
-
-      <!-- Weights Bar Chart -->
       <div class="panel reveal">
         <div class="panel-header"><h3 class="panel-title">熵权法指标权重</h3></div>
-        <div class="weight-list" id="weightList">
-          <!-- Filled by JS -->
-        </div>
+        <div class="weight-list" id="weightList"></div>
       </div>
-
     </div>
   </div>
 </section>
@@ -590,15 +547,13 @@
 <section class="section">
   <div class="container">
     <div class="section-header reveal">
-      <span class="section-number">02</span>
+      <span class="section-index">02</span>
       <h2 class="section-title">灰色关联系数矩阵</h2>
-      <p class="section-desc">每格数值表示该公司在该指标上与理想值的接近程度（越接近 1 越好）</p>
+      <p class="section-desc">数值越接近 1，表示该公司在该指标上越接近理想水平</p>
     </div>
     <div class="panel reveal">
       <div class="heatmap-wrapper">
-        <table class="heatmap-table" id="heatmapTable">
-          <!-- Filled by JS -->
-        </table>
+        <table class="heatmap-table" id="heatmapTable"></table>
       </div>
     </div>
   </div>
@@ -608,25 +563,25 @@
 <section class="section">
   <div class="container">
     <div class="section-header reveal">
-      <span class="section-number">03</span>
+      <span class="section-index">03</span>
       <h2 class="section-title">评价方法</h2>
       <p class="section-desc">组合赋权 + 灰色系统理论，兼顾客观性与全面性</p>
     </div>
     <div class="method-grid reveal">
       <div class="method-card">
-        <span class="method-icon">①</span>
+        <span class="method-step">I</span>
         <h4>数据归一化</h4>
-        <p>根据指标类型（偏大型/偏小型/中间型）分别采用不同的无量纲化公式，将原始数据统一至 [0,1] 区间，消除量纲影响。</p>
+        <p>根据指标类型（偏大型/偏小型/中间型）分别采用对应的无量纲化公式，将原始数据统一映射至 [0,1] 区间，消除量纲与数量级差异对评价结果的影响。</p>
       </div>
       <div class="method-card">
-        <span class="method-icon">②</span>
+        <span class="method-step">II</span>
         <h4>熵权法赋权</h4>
-        <p>基于信息熵理论计算各指标的客观权重。数据离散程度越大的指标，信息熵越小，提供的信息量越大，权重越高。</p>
+        <p>基于信息熵理论计算各指标的客观权重。指标数据离散程度越大，信息熵越小，说明该指标提供的信息量越大，其权重相应越高。</p>
       </div>
       <div class="method-card">
-        <span class="method-icon">③</span>
+        <span class="method-step">III</span>
         <h4>灰色关联分析</h4>
-        <p>以加权归一化矩阵的最优值构建参考序列（理想解），计算各公司与理想解的灰色关联度，关联度越高则综合评价越优。</p>
+        <p>以加权归一化矩阵的最优值构建参考序列（理想解），计算各评价对象与理想解的灰色关联度。关联度越高，综合评价排名越靠前。</p>
       </div>
     </div>
   </div>
@@ -636,10 +591,10 @@
 <footer class="footer">
   <div class="container">
     <p class="footer-text">
-      Model: Entropy Weight Method + Grey Relational Analysis ·
-      Resolution Coefficient ρ = <span class="footer-mono">0.5</span> ·
-      Indicators: <span class="footer-mono">19</span> ·
-      Companies: <span class="footer-mono">7</span>
+      Model: Entropy Weight Method + Grey Relational Analysis &nbsp;·&nbsp;
+      ρ = <span class="footer-mono">0.5</span> &nbsp;·&nbsp;
+      <span class="footer-mono">19</span> Indicators &nbsp;·&nbsp;
+      <span class="footer-mono">7</span> Companies
     </p>
   </div>
 </footer>
@@ -648,183 +603,139 @@
 <script>
 // ===== DATA =====
 const DATA = {
-  rankings: [{"company":"d","grade":0.891155,"rank":1},{"company":"a","grade":0.735631,"rank":2},{"company":"b","grade":0.635479,"rank":3},{"company":"c","grade":0.629996,"rank":4},{"company":"f","grade":0.547955,"rank":5},{"company":"e","grade":0.547008,"rank":6},{"company":"g","grade":0.504406,"rank":7}],
-  weights: [{"indicator":"C8_材料费","short":"材料费","weight":0.0905,"entropy":0.7056,"type":"偏小型"},{"indicator":"C9_运输费用","short":"运输费用","weight":0.0723,"entropy":0.7648,"type":"偏小型"},{"indicator":"C15_水耗费用","short":"水耗费用","weight":0.0616,"entropy":0.7997,"type":"偏小型"},{"indicator":"C17_广告宣传","short":"广告宣传","weight":0.0589,"entropy":0.8084,"type":"偏大型"},{"indicator":"C11_运行费用","short":"运行费用","weight":0.0571,"entropy":0.8142,"type":"偏小型"},{"indicator":"C2_产品质量","short":"产品质量","weight":0.057,"entropy":0.8145,"type":"偏大型"},{"indicator":"C5_产品包装","short":"产品包装","weight":0.057,"entropy":0.8144,"type":"中间型"},{"indicator":"C6_店铺信用度","short":"店铺信用度","weight":0.0541,"entropy":0.824,"type":"偏大型"},{"indicator":"C3_性价比","short":"性价比","weight":0.0519,"entropy":0.8311,"type":"偏大型"},{"indicator":"C7_售后服务","short":"售后服务","weight":0.0507,"entropy":0.835,"type":"偏大型"},{"indicator":"C19_家庭需求","short":"家庭需求","weight":0.0493,"entropy":0.8396,"type":"偏大型"},{"indicator":"C18_行业需求","short":"行业需求","weight":0.0488,"entropy":0.8413,"type":"偏大型"},{"indicator":"C12_设备折旧费用","short":"设备折旧费用","weight":0.0479,"entropy":0.844,"type":"偏小型"},{"indicator":"C14_电耗费用","short":"电耗费用","weight":0.0478,"entropy":0.8447,"type":"偏小型"},{"indicator":"C10_设备维修费用","short":"设备维修费用","weight":0.0453,"entropy":0.8526,"type":"偏小型"},{"indicator":"C16_销售人员能力","short":"销售人员能力","weight":0.0447,"entropy":0.8545,"type":"偏大型"},{"indicator":"C4_产品款式","short":"产品款式","weight":0.0406,"entropy":0.8679,"type":"偏大型"},{"indicator":"C13_人员工资","short":"人员工资","weight":0.0349,"entropy":0.8865,"type":"偏小型"},{"indicator":"C1_产品品牌","short":"产品品牌","weight":0.0294,"entropy":0.9043,"type":"中间型"}],
-  shortLabels: ["产品品牌","产品质量","性价比","产品款式","产品包装","店铺信用度","售后服务","材料费","运输费用","设备维修费用","运行费用","设备折旧费用","人员工资","电耗费用","水耗费用","销售人员能力","广告宣传","行业需求","家庭需求"],
-  weightedData: {"a":[0.0273,0.0434,0.0519,0.0406,0.0011,0.0541,0.0364,0.0504,0.0489,0.0359,0.0571,0.0222,0.0228,0.0391,0.0341,0.0248,0.0323,0.0088,0.0241],"b":[0.029,0.0277,0.0188,0.0142,0.0237,0.0085,0.018,0.0504,0.0425,0.0453,0.0263,0.0428,0.0201,0.045,0.0268,0.0066,0.0064,0.0174,0.008],"c":[0.0,0.0,0.0073,0.0183,0.0262,0.0242,0.0232,0.0337,0.0318,0.0252,0.0339,0.0111,0.0212,0.0213,0.0079,0.0348,0.0396,0.0488,0.0493],"d":[0.0147,0.057,0.0436,0.0286,0.0,0.0398,0.0507,0.0905,0.0723,0.0416,0.042,0.0479,0.0349,0.0478,0.0616,0.0447,0.0589,0.0272,0.0417],"e":[0.0212,0.0259,0.0465,0.0194,0.0303,0.0184,0.0164,0.0,0.0111,0.0142,0.0123,0.0133,0.0098,0.0091,0.0,0.0,0.0081,0.0122,0.0],"f":[0.017,0.0041,0.0156,0.0,0.0561,0.0,0.0064,0.0015,0.0,0.008,0.0042,0.0,0.0159,0.0,0.0098,0.0221,0.026,0.0208,0.0352],"g":[0.0174,0.0139,0.0,0.0098,0.0299,0.0111,0.0,0.0009,0.0003,0.0,0.0,0.0173,0.0,0.0136,0.0152,0.0168,0.0,0.0,0.0115]},
-  coeffMatrix: {"a":[0.9645,0.7688,1.0,1.0,0.4515,1.0,0.7595,0.5302,0.6588,0.8282,1.0,0.6375,0.7896,0.8385,0.6225,0.6941,0.6299,0.5309,0.6424],"b":[1.0,0.6072,0.5773,0.6319,0.5829,0.4982,0.5801,0.5302,0.603,1.0,0.595,0.8979,0.7537,0.942,0.5656,0.5426,0.4628,0.5904,0.5231],"c":[0.6093,0.4425,0.5036,0.6702,0.6023,0.6023,0.6218,0.4435,0.5276,0.6923,0.6606,0.5512,0.7681,0.6308,0.4575,0.8208,0.7004,1.0,1.0],"d":[0.7593,1.0,0.8453,0.7908,0.4464,0.7592,1.0,1.0,1.0,0.9234,0.7495,1.0,1.0,1.0,1.0,1.0,1.0,0.677,0.8562],"e":[0.8532,0.5929,0.8931,0.6809,0.6367,0.559,0.5685,0.3333,0.4248,0.5927,0.5025,0.5662,0.6435,0.5391,0.4235,0.5029,0.471,0.5529,0.4786],"f":[0.7897,0.461,0.5548,0.5271,1.0,0.4554,0.505,0.3371,0.3849,0.5484,0.4609,0.4855,0.7047,0.4866,0.4661,0.6663,0.5786,0.6178,0.7622],"g":[0.7951,0.5119,0.4657,0.5954,0.633,0.5124,0.4715,0.3356,0.386,0.4997,0.442,0.5965,0.5647,0.5698,0.494,0.6187,0.4344,0.4812,0.5449]}
+  rankings: [
+    {company:"d",grade:0.891155,rank:1},{company:"a",grade:0.735631,rank:2},{company:"b",grade:0.635479,rank:3},
+    {company:"c",grade:0.629996,rank:4},{company:"f",grade:0.547955,rank:5},{company:"e",grade:0.547008,rank:6},{company:"g",grade:0.504406,rank:7}
+  ],
+  weights: [
+    {indicator:"C8_材料费",short:"材料费",weight:0.0905,entropy:0.7056,type:"偏小型"},{indicator:"C9_运输费用",short:"运输费用",weight:0.0723,entropy:0.7648,type:"偏小型"},
+    {indicator:"C15_水耗费用",short:"水耗费用",weight:0.0616,entropy:0.7997,type:"偏小型"},{indicator:"C17_广告宣传",short:"广告宣传",weight:0.0589,entropy:0.8084,type:"偏大型"},
+    {indicator:"C11_运行费用",short:"运行费用",weight:0.0571,entropy:0.8142,type:"偏小型"},{indicator:"C2_产品质量",short:"产品质量",weight:0.057,entropy:0.8145,type:"偏大型"},
+    {indicator:"C5_产品包装",short:"产品包装",weight:0.057,entropy:0.8144,type:"中间型"},{indicator:"C6_店铺信用度",short:"店铺信用度",weight:0.0541,entropy:0.824,type:"偏大型"},
+    {indicator:"C3_性价比",short:"性价比",weight:0.0519,entropy:0.8311,type:"偏大型"},{indicator:"C7_售后服务",short:"售后服务",weight:0.0507,entropy:0.835,type:"偏大型"},
+    {indicator:"C19_家庭需求",short:"家庭需求",weight:0.0493,entropy:0.8396,type:"偏大型"},{indicator:"C18_行业需求",short:"行业需求",weight:0.0488,entropy:0.8413,type:"偏大型"},
+    {indicator:"C12_设备折旧费用",short:"设备折旧费用",weight:0.0479,entropy:0.844,type:"偏小型"},{indicator:"C14_电耗费用",short:"电耗费用",weight:0.0478,entropy:0.8447,type:"偏小型"},
+    {indicator:"C10_设备维修费用",short:"设备维修费用",weight:0.0453,entropy:0.8526,type:"偏小型"},{indicator:"C16_销售人员能力",short:"销售人员能力",weight:0.0447,entropy:0.8545,type:"偏大型"},
+    {indicator:"C4_产品款式",short:"产品款式",weight:0.0406,entropy:0.8679,type:"偏大型"},{indicator:"C13_人员工资",short:"人员工资",weight:0.0349,entropy:0.8865,type:"偏小型"},
+    {indicator:"C1_产品品牌",short:"产品品牌",weight:0.0294,entropy:0.9043,type:"中间型"}
+  ],
+  labels: ["产品品牌","产品质量","性价比","产品款式","产品包装","店铺信用度","售后服务","材料费","运输费用","设备维修费用","运行费用","设备折旧费用","人员工资","电耗费用","水耗费用","销售人员能力","广告宣传","行业需求","家庭需求"],
+  weightedData: {
+    a:[0.0273,0.0434,0.0519,0.0406,0.0011,0.0541,0.0364,0.0504,0.0489,0.0359,0.0571,0.0222,0.0228,0.0391,0.0341,0.0248,0.0323,0.0088,0.0241],
+    b:[0.029,0.0277,0.0188,0.0142,0.0237,0.0085,0.018,0.0504,0.0425,0.0453,0.0263,0.0428,0.0201,0.045,0.0268,0.0066,0.0064,0.0174,0.008],
+    c:[0,0,0.0073,0.0183,0.0262,0.0242,0.0232,0.0337,0.0318,0.0252,0.0339,0.0111,0.0212,0.0213,0.0079,0.0348,0.0396,0.0488,0.0493],
+    d:[0.0147,0.057,0.0436,0.0286,0,0.0398,0.0507,0.0905,0.0723,0.0416,0.042,0.0479,0.0349,0.0478,0.0616,0.0447,0.0589,0.0272,0.0417],
+    e:[0.0212,0.0259,0.0465,0.0194,0.0303,0.0184,0.0164,0,0.0111,0.0142,0.0123,0.0133,0.0098,0.0091,0,0,0.0081,0.0122,0],
+    f:[0.017,0.0041,0.0156,0,0.0561,0,0.0064,0.0015,0,0.008,0.0042,0,0.0159,0,0.0098,0.0221,0.026,0.0208,0.0352],
+    g:[0.0174,0.0139,0,0.0098,0.0299,0.0111,0,0.0009,0.0003,0,0,0.0173,0,0.0136,0.0152,0.0168,0,0,0.0115]
+  },
+  coeffMatrix: {
+    a:[0.9645,0.7688,1.0,1.0,0.4515,1.0,0.7595,0.5302,0.6588,0.8282,1.0,0.6375,0.7896,0.8385,0.6225,0.6941,0.6299,0.5309,0.6424],
+    b:[1.0,0.6072,0.5773,0.6319,0.5829,0.4982,0.5801,0.5302,0.603,1.0,0.595,0.8979,0.7537,0.942,0.5656,0.5426,0.4628,0.5904,0.5231],
+    c:[0.6093,0.4425,0.5036,0.6702,0.6023,0.6023,0.6218,0.4435,0.5276,0.6923,0.6606,0.5512,0.7681,0.6308,0.4575,0.8208,0.7004,1.0,1.0],
+    d:[0.7593,1.0,0.8453,0.7908,0.4464,0.7592,1.0,1.0,1.0,0.9234,0.7495,1.0,1.0,1.0,1.0,1.0,1.0,0.677,0.8562],
+    e:[0.8532,0.5929,0.8931,0.6809,0.6367,0.559,0.5685,0.3333,0.4248,0.5927,0.5025,0.5662,0.6435,0.5391,0.4235,0.5029,0.471,0.5529,0.4786],
+    f:[0.7897,0.461,0.5548,0.5271,1.0,0.4554,0.505,0.3371,0.3849,0.5484,0.4609,0.4855,0.7047,0.4866,0.4661,0.6663,0.5786,0.6178,0.7622],
+    g:[0.7951,0.5119,0.4657,0.5954,0.633,0.5124,0.4715,0.3356,0.386,0.4997,0.442,0.5965,0.5647,0.5698,0.494,0.6187,0.4344,0.4812,0.5449]
+  }
 };
 
-// ===== RANKING CARDS =====
-function getBadgeClass(rank) {
-  if (rank === 1) return 'gold';
-  if (rank === 2) return 'silver';
-  if (rank === 3) return 'bronze';
-  return 'normal';
-}
-
-function getLevel(grade, maxGrade) {
-  if (grade >= maxGrade * 0.9) return '优秀';
-  if (grade >= maxGrade * 0.8) return '良好';
-  if (grade >= maxGrade * 0.7) return '中等';
-  return '一般';
-}
-
-const rankingGrid = document.getElementById('rankingGrid');
+const companies = ['a','b','c','d','e','f','g'];
+const labels = DATA.labels;
 const maxGrade = DATA.rankings[0].grade;
-DATA.rankings.forEach(r => {
+
+// ===== RANKING CARDS =====
+const rankingGrid = document.getElementById('rankingGrid');
+const badgeClasses = ['gold','silver','bronze','normal','normal','normal','normal'];
+DATA.rankings.forEach((r, i) => {
   const card = document.createElement('div');
   card.className = `rank-card${r.rank === 1 ? ' winner' : ''}`;
+  const level = r.grade >= maxGrade*0.9 ? '优秀' : r.grade >= maxGrade*0.8 ? '良好' : r.grade >= maxGrade*0.7 ? '中等' : '一般';
   card.innerHTML = `
-    <div class="rank-badge ${getBadgeClass(r.rank)}">${r.rank}</div>
+    <div class="rank-badge ${badgeClasses[i]}">${r.rank}</div>
     <div class="rank-company">${r.company.toUpperCase()}</div>
     <div class="rank-grade">${r.grade.toFixed(6)}</div>
-    <div class="rank-bar-bg"><div class="rank-bar-fill${r.rank === 1 ? ' top' : ''}" style="width:${(r.grade / maxGrade * 100).toFixed(0)}%"></div></div>
-    <div class="rank-level">${getLevel(r.grade, maxGrade)}</div>
+    <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${(r.grade/maxGrade*100).toFixed(0)}%"></div></div>
+    <div class="rank-level">${level}</div>
   `;
   rankingGrid.appendChild(card);
 });
 
 // ===== WEIGHT BARS =====
 const weightList = document.getElementById('weightList');
-const sortedWeights = [...DATA.weights].sort((a, b) => b.weight - a.weight);
+const sortedWeights = [...DATA.weights].sort((a,b) => b.weight - a.weight);
 sortedWeights.forEach(w => {
-  let fillClass = 'benefit';
-  if (w.type === '偏小型') fillClass = 'cost';
-  else if (w.type === '中间型') fillClass = 'medium';
-
-  const item = document.createElement('div');
-  item.className = 'weight-item';
-  item.innerHTML = `
+  const cls = w.type === '偏小型' ? 'cost' : w.type === '中间型' ? 'medium' : 'benefit';
+  const div = document.createElement('div');
+  div.className = 'weight-item';
+  div.innerHTML = `
     <span class="weight-label" title="${w.indicator}">${w.short}</span>
-    <div class="weight-track"><div class="weight-fill ${fillClass}" style="width:${(w.weight / sortedWeights[0].weight * 100).toFixed(0)}%"></div></div>
+    <div class="weight-track"><div class="weight-fill ${cls}" style="width:${(w.weight/sortedWeights[0].weight*100).toFixed(0)}%"></div></div>
     <span class="weight-value">${w.weight.toFixed(4)}</span>
   `;
-  weightList.appendChild(item);
+  weightList.appendChild(div);
 });
 
-// ===== HEATMAP TABLE =====
+// ===== HEATMAP =====
 const heatmapTable = document.getElementById('heatmapTable');
-const companies = ['a','b','c','d','e','f','g'];
-const labels = DATA.shortLabels;
-
-// Header
-let theadHTML = '<thead><tr><th>指标 \\ 公司</th>';
-companies.forEach(c => { theadHTML += `<th>${c.toUpperCase()}</th>`; });
-theadHTML += '</tr></thead>';
-
-// Body
-let tbodyHTML = '<tbody>';
-labels.forEach((label, i) => {
-  tbodyHTML += `<tr><td>${label}</td>`;
+let html = '<thead><tr><th>指标 \\ 公司</th>';
+companies.forEach(c => html += `<th>${c.toUpperCase()}</th>`);
+html += '</tr></thead><tbody>';
+labels.forEach((lbl, i) => {
+  html += `<tr><td>${lbl}</td>`;
   companies.forEach(c => {
-    const val = DATA.coeffMatrix[c][i];
-    // Green gradient: higher = more green
-    const intensity = Math.round(val * 255);
-    const bg = `rgba(${Math.round(61 - val*30)}, ${Math.round(150 + val*80)}, ${Math.round(100 + val*80)}, ${0.15 + val * 0.35})`;
-    const textColor = val >= 0.85 ? 'var(--teal)' : val >= 0.7 ? 'var(--text-primary)' : 'var(--text-secondary)';
-    tbodyHTML += `<td style="background:${bg};color:${textColor};font-weight:${val >= 0.9 ? 600 : 400}">${val.toFixed(2)}</td>`;
+    const v = DATA.coeffMatrix[c][i];
+    const intensity = Math.round(v * 255);
+    const bg = `rgba(${Math.round(61-v*30)},${Math.round(150+v*80)},${Math.round(100+v*80)},${0.15+v*0.35})`;
+    html += `<td style="background:${bg};color:${v>=0.85?'var(--teal)':v>=0.7?'var(--text-primary)':'var(--text-secondary)'};font-weight:${v>=0.9?600:400}">${v.toFixed(2)}</td>`;
   });
-  tbodyHTML += '</tr>';
+  html += '</tr>';
 });
-tbodyHTML += '</tbody>';
-heatmapTable.innerHTML = theadHTML + tbodyHTML;
+html += '</tbody>';
+heatmapTable.innerHTML = html;
 
 // ===== RADAR CHART =====
-const radarCtx = document.getElementById('radarChart').getContext('2d');
-const radarColors = {
-  d: { bg: 'rgba(61,217,165,0.18)', border: '#3dd9a5' },
-  a: { bg: 'rgba(91,141,239,0.15)', border: '#5b8def' },
-  b: { bg: 'rgba(240,192,64,0.12)', border: '#f0c040' },
-  c: { bg: 'rgba(160,120,255,0.12)', border: '#a078ff' },
-  f: { bg: 'rgba(255,107,107,0.10)', border: '#ff6b6b' },
-  e: { bg: 'rgba(148,163,184,0.10)', border: '#94a3b8' },
-  g: { bg: 'rgba(148,163,184,0.08)', border: '#6b7d95' }
+const rColors = {
+  d:{bg:'rgba(61,217,165,0.18)',bd:'#3dd9a5'},
+  a:{bg:'rgba(91,141,239,0.15)',bd:'#5b8def'},
+  b:{bg:'rgba(240,188,74,0.14)',bd:'#f0bc4a'},
+  c:{bg:'rgba(160,120,255,0.12)',bd:'#a078ff'},
+  f:{bg:'rgba(255,107,107,0.10)',bd:'#ff6b6b'},
+  e:{bg:'rgba(148,163,184,0.10)',bd:'#94a3b8'},
+  g:{bg:'rgba(100,116,139,0.08)',bd:'#64748b'}
 };
+let active = ['d','a','b'];
 
-let activeCompanies = ['d', 'a', 'b']; // Default show top 3
-
-function buildRadarDatasets() {
-  return activeCompanies.map(c => ({
-    label: `公司 ${c.toUpperCase()}`,
-    data: DATA.weightedData[c],
-    backgroundColor: radarColors[c].bg,
-    borderColor: radarColors[c].border,
-    borderWidth: c === 'd' ? 2.5 : 1.8,
-    pointRadius: c === 'd' ? 4 : 3,
-    pointBackgroundColor: radarColors[c].border,
-    pointBorderColor: 'transparent',
-    tension: 0.1
-  }));
-}
-
-const radarChart = new Chart(radarCtx, {
-  type: 'radar',
-  data: {
-    labels: labels,
-    datasets: buildRadarDatasets()
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: true,
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      r: {
-        beginAtZero: true,
-        max: 0.1,
-        ticks: {
-          stepSize: 0.02,
-          color: 'rgba(255,255,255,0.25)',
-          backdropColor: 'transparent',
-          font: { size: 9, family: "'DM Mono', monospace" },
-          callback: v => v.toFixed(2)
-        },
-        pointLabels: {
-          color: 'rgba(255,255,255,0.6)',
-          font: { size: 9, family: "'DM Sans', 'Noto Sans SC', sans-serif" }
-        },
-        grid: { color: 'rgba(255,255,255,0.06)' },
-        angleLines: { color: 'rgba(255,255,255,0.06)' }
-      }
-    }
+const radar = new Chart(document.getElementById('radarChart').getContext('2d'), {
+  type:'radar',
+  data:{labels,datasets:active.map(c=>({label:`公司 ${c.toUpperCase()}`,data:DATA.weightedData[c],backgroundColor:rColors[c].bg,borderColor:rColors[c].bd,borderWidth:c==='d'?2.5:1.8,pointRadius:c==='d'?4:3,pointBackgroundColor:rColors[c].bd,pointBorderColor:'transparent'}))},
+  options:{
+    responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{display:false}},
+    scales:{r:{beginAtZero:true,max:0.102,ticks:{stepSize:0.02,color:'rgba(255,255,255,0.22)',backdropColor:'transparent',font:{size:9,family:"'Space Mono',monospace"},callback:v=>v.toFixed(2)},pointLabels:{color:'rgba(255,255,255,0.55)',font:{size:9,family:"'Manrope','Noto Sans SC',sans-serif"}},grid:{color:'rgba(255,255,255,0.05)'},angleLines:{color:'rgba(255,255,255,0.05)'}}}
   }
 });
 
 // ===== RADAR TOGGLES =====
-const togglesContainer = document.getElementById('radarToggles');
+const toggles = document.getElementById('radarToggles');
 companies.forEach(c => {
   const btn = document.createElement('button');
-  btn.className = `toggle-btn${activeCompanies.includes(c) ? ' active' : ''}`;
+  btn.className = `toggle-btn${active.includes(c)?' active':''}`;
   btn.textContent = `公司 ${c.toUpperCase()}`;
-  btn.addEventListener('click', () => {
-    if (activeCompanies.includes(c)) {
-      if (activeCompanies.length <= 1) return; // Keep at least 1
-      activeCompanies = activeCompanies.filter(x => x !== c);
-      btn.classList.remove('active');
-    } else {
-      activeCompanies.push(c);
-      btn.classList.add('active');
-    }
-    radarChart.data.datasets = buildRadarDatasets();
-    radarChart.update();
-  });
-  togglesContainer.appendChild(btn);
+  btn.onclick = () => {
+    if (active.includes(c)) { if(active.length<=1)return; active=active.filter(x=>x!==c); btn.classList.remove('active'); }
+    else { active.push(c); btn.classList.add('active'); }
+    radar.data.datasets = active.map(c=>({label:`公司 ${c.toUpperCase()}`,data:DATA.weightedData[c],backgroundColor:rColors[c].bg,borderColor:rColors[c].bd,borderWidth:c==='d'?2.5:1.8,pointRadius:c==='d'?4:3,pointBackgroundColor:rColors[c].bd,pointBorderColor:'transparent'}));
+    radar.update();
+  };
+  toggles.appendChild(btn);
 });
 
 // ===== SCROLL REVEAL =====
-const reveals = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-reveals.forEach(el => observer.observe(el));
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, {threshold:0.12,rootMargin:'0px 0px -36px 0px'});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
-
 </body>
 </html>
